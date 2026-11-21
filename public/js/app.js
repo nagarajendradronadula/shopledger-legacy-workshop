@@ -2,6 +2,7 @@ var allProducts = [];
 var cartQuantities = {}; // productId -> qty
 var activeCategory = 'all';
 var customersList = [];
+var latestProductsRequest = 0;
 
 function get(url, cb) {
   var x = new XMLHttpRequest();
@@ -218,8 +219,9 @@ function updateCartPreview() {
 }
 
 function loadProducts() {
-  get('/api/products', function (data) {
-    if (!data) return;
+  var requestId = ++latestProductsRequest;
+  get('/api/products?refresh=' + requestId + '-' + Date.now(), function (data, status) {
+    if (requestId !== latestProductsRequest || status !== 200 || !data) return;
     allProducts = data;
     renderCatalogTable();
     renderInventoryAuditTable();
@@ -433,6 +435,7 @@ function showTab(which) {
     document.getElementById('view-' + t).style.display = (t === which) ? '' : 'none';
     document.getElementById('tab-' + t).className = (t === which) ? 'tab-link active' : 'tab-link';
   }
+  if (which === 'new') loadProducts();
   if (which === 'orders') loadOrders();
   if (which === 'khata') loadCustomersDropdown();
   if (which === 'audit') {
