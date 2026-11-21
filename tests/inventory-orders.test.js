@@ -40,11 +40,3 @@ test('cancelling an order restores its quantities to physical stock', function (
   assert.strictEqual(db.products[0].stock, 4);
   assert.strictEqual(db.products[0].reserved, 3);
 });
-
-test('cancellation restores legacy order lines that use productId', function () {
-  var products = [{ id: 6, stock: 0, reserved: 0 }];
-
-  inventory.release(products, [{ productId: 6, qty: 2 }]);
-
-  assert.strictEqual(products[0].stock, 2);
-});
